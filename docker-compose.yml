@@ -1,0 +1,53 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: invoiceops-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: invoiceops
+      POSTGRES_PASSWORD: invoiceops
+      POSTGRES_DB: invoiceops
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U invoiceops -d invoiceops"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: .
+    container_name: invoiceops-api
+    restart: unless-stopped
+    ports:
+      # Host 8000 -> container 8080 (uvicorn binds $PORT, default 8080 per Dockerfile).
+      - "8000:8080"
+    environment:
+      DATABASE_URL: postgresql://invoiceops:invoiceops@db:5432/invoiceops
+      LLM_PROVIDER: ${LLM_PROVIDER:-openai}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o-mini}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      ANTHROPIC_MODEL: ${ANTHROPIC_MODEL:-claude-3-5-sonnet-latest}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-3.5-flash}
+      GEMINI_TIMEOUT_SECONDS: ${GEMINI_TIMEOUT_SECONDS:-90}
+      GEMINI_RETRY_ATTEMPTS: ${GEMINI_RETRY_ATTEMPTS:-2}
+      # Document AI (agent perception backend). Left blank -> agent falls back to
+      # the PyMuPDF + LLM path.
+      DOCAI_PROJECT_ID: ${DOCAI_PROJECT_ID:-}
+      DOCAI_LOCATION: ${DOCAI_LOCATION:-us}
+      DOCAI_PROCESSOR_ID: ${DOCAI_PROCESSOR_ID:-}
+      GOOGLE_APPLICATION_CREDENTIALS: /secrets/docai-sa.json
+    volumes:
+      # Service-account key for Document AI (read-only; ignored by git).
+      - ./docai-sa.json:/secrets/docai-sa.json:ro
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

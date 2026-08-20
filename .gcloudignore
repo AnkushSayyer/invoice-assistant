@@ -1,0 +1,24 @@
+# Keep the Cloud Build upload small and free of secrets/local cruft.
+# (Uses .gitignore-style syntax.)
+.git/
+.gitignore
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Secrets / local env — never upload
+.env
+.env.*
+docai-sa.json
+*.pem
+
+# Local-only assets
+tests/
+docs/
+terminals/
+*.pdf
+.DS_Store

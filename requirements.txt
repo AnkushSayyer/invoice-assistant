@@ -1,0 +1,20 @@
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+python-multipart>=0.0.12
+sqlalchemy>=2.0.36
+psycopg2-binary>=2.9.10
+pydantic>=2.10.0
+pydantic-settings>=2.6.0
+python-dotenv>=1.0.1
+PyMuPDF>=1.24.0
+instructor[google-genai]>=1.7.0
+openai>=1.57.0
+anthropic>=0.49.0
+google-genai>=1.16.0
+# Optional: Google Document AI Invoice Parser backend for the agent. The app runs
+# fine without it (the agent falls back to the PyMuPDF + LLM extractor).
+google-cloud-documentai>=2.29.0
+
+# dev / test
+pytest>=8.3.0
+httpx>=0.28.0

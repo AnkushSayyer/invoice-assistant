@@ -1,0 +1,24 @@
+# Project: InvoiceOps AI (FastAPI + Postgres)
+
+## Stack Rules
+- Language: Python 3.11+
+- Framework: FastAPI
+- Database: PostgreSQL with SQLAlchemy 2.0 and Pydantic v2 schemas
+- PDF Parser: PyMuPDF (import fitz)
+- LLM Structured Output: Instructor + OpenAI client
+- Containerization: Docker + docker-compose (Postgres with pg_trgm extension)
+
+## Code Standards
+- Always use explicit type hints (`str`, `UUID`, `Optional`, `Dict`, etc.).
+- Separate concerns into clean modules:
+  - `app/api/`: FastAPI route handlers only.
+  - `app/services/`: Core business logic (masking, LLM extraction, validation, template matching).
+  - `app/db/`: Database session, engine setup, and SQLAlchemy models.
+  - `app/schemas/`: Pydantic models for API request/response and Instructor outputs.
+- Never write inline math validation inside route handlers. Put logic in `app/services/validation.py`.
+- Ensure all database queries related to string similarity use PostgreSQL `pg_trgm` functions.
+- Handle failures explicitly: catch PyMuPDF read errors, LLM timeouts, and database connection errors gracefully with clean HTTP 4xx/5xx responses.
+
+## Testing Rules
+- Every service module must have corresponding unit tests in `tests/`.
+- Use `pytest`. Test fingerprinting regex logic, math validation edge cases, and API routing.
