@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>InvoiceOps AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="/ui/styles.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A7%BE%3C/text%3E%3C/svg%3E" />
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">IO</div>
+      <div>
+        <div class="brand-name">InvoiceOps AI</div>
+        <div class="brand-sub">Autonomous expense agent</div>
+      </div>
+    </div>
+    <nav class="nav">
+      <button class="nav-item active" data-view="process">
+        <span class="nav-ico">⚡</span> Process invoice
+      </button>
+      <button class="nav-item" data-view="clarify">
+        <span class="nav-ico">❓</span> Needs input
+        <span class="badge-count" id="clarifyCount" hidden>0</span>
+      </button>
+      <button class="nav-item" data-view="queue">
+        <span class="nav-ico">🗂️</span> Review queue
+        <span class="badge-count" id="queueCount" hidden>0</span>
+      </button>
+      <button class="nav-item" data-view="runs">
+        <span class="nav-ico">📜</span> Audit trail
+      </button>
+      <button class="nav-item" data-view="training">
+        <span class="nav-ico">🎓</span> Training data
+      </button>
+    </nav>
+    <div class="sidebar-foot">
+      <a href="/docs" target="_blank" rel="noopener">API docs ↗</a>
+    </div>
+  </aside>
+
+  <main class="content">
+    <!-- PROCESS ------------------------------------------------------------- -->
+    <section class="view active" id="view-process">
+      <header class="view-head">
+        <h1>Process an invoice</h1>
+        <p>Upload a PDF and let the agent perceive, reconcile, and decide.</p>
+      </header>
+
+      <form id="processForm" class="card upload-card">
+        <label class="dropzone" id="dropzone">
+          <input type="file" id="fileInput" accept="application/pdf" hidden />
+          <div class="dz-inner">
+            <div class="dz-ico">📄</div>
+            <div class="dz-text"><strong>Choose a PDF</strong> or drop it here</div>
+            <div class="dz-file" id="fileName">No file selected</div>
+          </div>
+        </label>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="claimedAmount">Claimed amount</label>
+            <div class="input-money">
+              <span>₹</span>
+              <input type="number" id="claimedAmount" step="0.01" min="0" placeholder="0.00" required />
+            </div>
+          </div>
+          <div class="field">
+            <label for="category">Category <span class="muted">(optional)</span></label>
+            <input type="text" id="category" placeholder="e.g. meals, travel" />
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="processBtn">
+          Run agent
+        </button>
+      </form>
+
+      <div id="processResult" class="result-area"></div>
+    </section>
+
+    <!-- CLARIFY (NEEDS INPUT) ----------------------------------------------- -->
+    <section class="view" id="view-clarify">
+      <header class="view-head">
+        <h1>Needs input</h1>
+        <p>Targeted questions the agent asked. Answer once and it learns the rule so it never asks again.</p>
+        <button class="btn btn-ghost btn-refresh" data-refresh="clarify">↻ Refresh</button>
+      </header>
+      <div id="clarifyList" class="stack"></div>
+    </section>
+
+    <!-- QUEUE --------------------------------------------------------------- -->
+    <section class="view" id="view-queue">
+      <header class="view-head">
+        <h1>Review queue</h1>
+        <p>Documents the agent escalated or rejected, awaiting a human.</p>
+        <button class="btn btn-ghost btn-refresh" data-refresh="queue">↻ Refresh</button>
+      </header>
+      <div id="queueList" class="stack"></div>
+    </section>
+
+    <!-- RUNS ---------------------------------------------------------------- -->
+    <section class="view" id="view-runs">
+      <header class="view-head">
+        <h1>Audit trail</h1>
+        <p>Every autonomous and human decision, most recent first.</p>
+        <button class="btn btn-ghost btn-refresh" data-refresh="runs">↻ Refresh</button>
+      </header>
+      <div id="runsList" class="stack"></div>
+    </section>
+
+    <!-- TRAINING ------------------------------------------------------------ -->
+    <section class="view" id="view-training">
+      <header class="view-head">
+        <h1>Training data</h1>
+        <p>Human-verified invoices to uptrain the parser over time.</p>
+        <button class="btn btn-ghost btn-refresh" data-refresh="training">↻ Refresh</button>
+      </header>
+      <div id="trainingList" class="stack"></div>
+    </section>
+  </main>
+
+  <!-- RESOLVE DRAWER -------------------------------------------------------- -->
+  <div class="drawer-overlay" id="drawerOverlay" hidden></div>
+  <aside class="drawer" id="resolveDrawer" hidden>
+    <div class="drawer-head">
+      <h2>Resolve document</h2>
+      <button class="icon-btn" id="drawerClose">✕</button>
+    </div>
+    <div class="drawer-body" id="drawerBody"></div>
+  </aside>
+
+  <div class="toast-wrap" id="toastWrap"></div>
+
+  <script src="/ui/app.js"></script>
+</body>
+</html>
